@@ -1,0 +1,151 @@
+use ('empresa')
+db.empleados.insertMany([
+  {id:1, nombre:  'Franco', edad:25, puesto:'Ventas' },
+  {id:2, nombre:  'Santiago', edad:24, puesto:'HR' },
+  {id:3, nombre: 'Manuel', edad:23, puesto:'pasante'}
+]);
+
+db.empleados.updateOne({nombre:"Franco"},{$set:{edad:26}})
+db.empleados.findOne({ nombre: "Franco" })
+
+db.empleados.deleteOne({puesto: "pasante" })
+db.empleados.findOne({puesto: "pasante" })
+
+db.empleados.find({$and: [{edad: {$gt:25}},{edad: {$lt:40}}]})
+
+db.empleados.find({}, { nombre: 1,puesto:1,edad:1, _id: 0 })
+
+db.empleados.updateOne(
+  {nombre:"Franco"},
+  {
+    $set:{
+      "direccion": { 
+        ciudad: "Bahia Blanca",
+        calle:"Alem", 
+        codigo: 8000
+      }
+    }
+  }
+)
+
+
+db.empleados.updateOne(
+  { nombre: "Santiago" },
+  {
+    $set: {
+      direccion: {
+        ciudad: "Bahia Blanca",
+        calle: "12 de Octubre",
+        codigo: 8000
+      }
+    }
+  }
+)
+db.empleados.find()
+
+db.ventas.insertMany([
+  {
+    id:1,
+    producto: "Laptop",
+    cantidad: 2,
+    precio_unitario: 1200.00
+  },
+  {
+    id:2,
+    producto: "Mouse",
+    cantidad: 5,
+    precio_unitario: 25.50
+  },
+  {
+    id:3,
+    producto: "Teclado",
+    cantidad: 3,
+    precio_unitario: 45.00
+  }
+])
+
+db.ventas.aggregate([
+  {
+    $group: {
+      _id: "$producto",
+      total: { $sum: { $multiply: ["$cantidad", "$precio_unitario"] } }
+    }
+  }
+])
+
+db.clientes.insertMany([
+  {
+    id: 1,
+    nombre: "Franco",
+    apellido: "Rossi",
+    edad: 30
+  },
+  {
+    id: 2,
+    nombre: "Santiago",
+    apellido: "Recari",
+    edad: 45
+  },
+  {
+    id: 3,
+    nombre: "Manuel",
+    apellido: "Galdames",
+    edad: 28
+  }
+])
+
+db.clientes.createIndex({ nombre: 1, apellido: 1 })
+
+db.cursos.insertMany([
+  {
+    id: 101,
+    nombre: "Matemática",
+    activo: true
+  },
+  {
+    id: 102,
+    nombre: "Programación",
+    activo: true
+  },
+  {
+    id: 103,
+    nombre: "Historia",
+    activo: false
+  }
+])
+
+db.alumnos.insertMany([
+  {
+    id: 1,
+    nombre: "Franco",
+    apellido: "Rossi",
+    edad: 20,
+    id_curso: [101, 102]
+  },
+  {
+    id: 2,
+    nombre: "Santiago",
+    apellido: "Recari",
+    edad: 22,
+    id_curso: [102]
+  },
+  {
+    id: 3,
+    nombre: "Manuel",
+    apellido: "Galdames",
+    edad: 19,
+    id_curso: [101, 103]
+  }
+])
+
+db.alumnos.aggregate([
+  {
+    $lookup: {
+      from: "cursos",
+      localField: "id_curso",
+      foreignField: "id",
+      as: "curso_almunos"
+    }
+  }  
+])
+
