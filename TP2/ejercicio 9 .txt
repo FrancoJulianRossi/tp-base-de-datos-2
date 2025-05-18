@@ -8,13 +8,4 @@ Con la escalabilidad horizontal se pueden crear más servidores para distribuir 
 Ventajas del replica Set
 Al crear nodos secundarios, si uno falla, hay otro que toma su lugar y se puede seguir accediendo a los datos y gracias a la replicación se pueden recuperar más rápido
 
-Ejercicio 10:
 
-Creación de usuario:
-	db.createUser({ user: "admin", pwd: "clave", roles: ["readWrite", "dbAdmin"] })
-
-Backup
-	mongodump --db nombre_de_la_bd
-
-Restauración:
-mongorestore --db nombre_de_la_bd dump/nombre_de_la_bd

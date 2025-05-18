@@ -1,0 +1,9 @@
+use('nombre_de_la_bd')
+//Creación de usuario:
+	db.createUser({ user: "admin", pwd: "clave", roles: ["readWrite", "dbAdmin"] })
+
+//Backup
+	mongodump --db nombre_de_la_bd
+
+//Restauración:
+mongorestore --db nombre_de_la_bd dump/nombre_de_la_bd

@@ -1,0 +1,8 @@
+use ('empresa')
+db.empleados.insertMany([
+  {id:1, nombre:  'Franco', edad:25, puesto:'Ventas' },
+  {id:2, nombre:  'Santiago', edad:24, puesto:'HR' },
+  {id:3, nombre: 'Manuel', edad:23, puesto:'pasante'}
+]);
+
+db.empleados.find({}, { nombre: 1,puesto:1,edad:1, _id: 0 })

@@ -1,0 +1,55 @@
+use ('empresa')
+
+db.cursos.insertMany([
+  {
+    id: 101,
+    nombre: "Matemática",
+    activo: true
+  },
+  {
+    id: 102,
+    nombre: "Programación",
+    activo: true
+  },
+  {
+    id: 103,
+    nombre: "Historia",
+    activo: false
+  }
+])
+
+db.alumnos.insertMany([
+  {
+    id: 1,
+    nombre: "Franco",
+    apellido: "Rossi",
+    edad: 20,
+    id_curso: [101, 102]
+  },
+  {
+    id: 2,
+    nombre: "Santiago",
+    apellido: "Recari",
+    edad: 22,
+    id_curso: [102]
+  },
+  {
+    id: 3,
+    nombre: "Manuel",
+    apellido: "Galdames",
+    edad: 19,
+    id_curso: [101, 103]
+  }
+])
+
+db.alumnos.aggregate([
+  {
+    $lookup: {
+      from: "cursos",
+      localField: "id_curso",
+      foreignField: "id",
+      as: "curso_almunos"
+    }
+  }  
+])
+

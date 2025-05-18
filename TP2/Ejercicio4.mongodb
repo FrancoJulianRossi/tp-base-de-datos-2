@@ -1,0 +1,46 @@
+use ('empresa')
+db.empleados.insertMany([
+  {id:1, nombre:  'Franco', edad:25, puesto:'Ventas' },
+  {id:2, nombre:  'Santiago', edad:24, puesto:'HR' },
+  {id:3, nombre: 'Manuel', edad:23, puesto:'pasante'}
+]);
+
+db.empleados.updateOne(
+  {nombre:"Franco"},
+  {
+    $set:{
+      "direccion": { 
+        ciudad: "Bahia Blanca",
+        calle:"Alem", 
+        codigo: 8000
+      }
+    }
+  }
+)
+
+
+db.empleados.updateOne(
+  { nombre: "Santiago" },
+  {
+    $set: {
+      direccion: {
+        ciudad: "Bahia Blanca",
+        calle: "12 de Octubre",
+        codigo: 8000
+      }
+    }
+  }
+)
+
+db.empleados.updateOne(
+  { nombre: "Manuel" },
+  {
+    $set: {
+      direccion: {
+        ciudad: "Bahia Blanca",
+        calle: "11 de Abril",
+        codigo: 8000
+      }
+    }
+  }
+)
