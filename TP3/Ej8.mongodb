@@ -1,0 +1,32 @@
+use('tiendaOnline')
+
+db.productos.aggregate([
+    {
+        $lookup: {
+            from: "ventas",
+            localField: "_id",
+            foreignField: "producto_id",
+            as: "ventas"
+        }
+    },
+    {
+        $unwind: "$ventas"
+    },
+    {
+        $unwind: "$valoraciones"
+    },
+    {
+        $group: {
+            _id: "$_id",
+            nombre: { $first: "$nombre" },
+            categoria: { $first: "$categoria" },
+            cantidadVendida: { $sum: "$ventas.cantidad" },
+            montoTotal: { $sum: "$ventas.total" },
+            puntuacionPromedio: { $avg: "$valoraciones.puntuacion" }
+        }
+    },
+    {
+        $sort: { cantidadVendida: -1 }
+    },
+    { $limit: 3 }
+])

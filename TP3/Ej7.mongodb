@@ -1,0 +1,50 @@
+use('tiendaOnline')
+db.productos.aggregate([
+    {
+        $project: {
+            categoriaPrecios: {
+                $cond: {
+                    if: { $lt: ["$precio", 100] }, then: "economico",
+                    else: {
+                        $cond: {
+                            if: { $lt: ["$precio", 500] }, then: "estandar",
+                            else: "premiun"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        $group: {
+            _id: "$categoriaPrecios",
+            sumProd: { $sum: 1 }
+        }
+    }
+])
+
+db.ventas.aggregate([
+    {
+        $project: {
+            categoriaVentas: {
+                $cond: {
+                    if: { $lt: ["$total", 200] }, then: "pequeña",
+                    else: {
+                        $cond: {
+                            if: { $lt: ["$total", 800] }, then: "mediana",
+                            else: "grande"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        $group: {
+            _id: "$categoriaVentas",
+            sumVent: { $sum: 1 }
+        }
+    }
+])
+
+
