@@ -1,0 +1,62 @@
+// Crear Departamentos
+CREATE (:Departamento {nombre: 'Desarrollo'}),
+       (:Departamento {nombre: 'Marketing'}),
+       (:Departamento {nombre: 'RRHH'});
+
+// Crear Empleados
+CREATE (e1:Empleado {nombre: 'Ana', apellido: 'García'}),
+       (e2:Empleado {nombre: 'Carlos', apellido: 'Pérez'}),
+       (e3:Empleado {nombre: 'Lucía', apellido: 'Martínez'});
+
+// Crear relación Empleado -> Departamento
+MATCH (d1:Departamento {nombre: 'Desarrollo'}),
+      (d2:Departamento {nombre: 'Marketing'}),
+      (d3:Departamento {nombre: 'RRHH'}),
+      (e1:Empleado {nombre: 'Ana'}),
+      (e2:Empleado {nombre: 'Carlos'}),
+      (e3:Empleado {nombre: 'Lucía'})
+CREATE (e1)-[:PERTENECE_A]->(d1),
+       (e2)-[:PERTENECE_A]->(d2),
+       (e3)-[:PERTENECE_A]->(d3);
+
+// Crear Proyectos
+CREATE (p1:Proyecto {nombre: 'Intranet'}),
+       (p2:Proyecto {nombre: 'Campaña Digital'});
+
+// Asignar empleados a proyectos con horas
+MATCH (e1:Empleado {nombre: 'Ana'}),
+      (e2:Empleado {nombre: 'Carlos'}),
+      (e3:Empleado {nombre: 'Lucía'}),
+      (p1:Proyecto {nombre: 'Intranet'}),
+      (p2:Proyecto {nombre: 'Campaña Digital'})
+CREATE (e1)-[:TRABAJA_EN {horasSemanales: 10}]->(p1),
+       (e2)-[:TRABAJA_EN {horasSemanales: 15}]->(p1),
+       (e2)-[:TRABAJA_EN {horasSemanales: 5}]->(p2),
+       (e3)-[:TRABAJA_EN {horasSemanales: 20}]->(p2);
+
+// Liderazgo
+MATCH (e1:Empleado {nombre: 'Ana'}),
+      (e3:Empleado {nombre: 'Lucía'}),
+      (p1:Proyecto {nombre: 'Intranet'}),
+      (p2:Proyecto {nombre: 'Campaña Digital'})
+CREATE (e1)-[:LIDERA]->(p1),
+       (e3)-[:LIDERA]->(p2);
+
+//Obtener el nombre del proyecto, su líder y los empleados asignados
+	MATCH (líder:Empleado)-[:LIDERA]->(p:Proyecto)
+	OPTIONAL MATCH (e:Empleado)-[t:TRABAJA_EN]->(p)
+	RETURN p.nombre AS Proyecto,
+       		líder.nombre + " " + líder.apellido AS Lider,
+       		collect(e.nombre + " " + e.apellido) AS EmpleadosAsignados;
+
+//Calcular el total de horas semanales por proyecto
+	MATCH (e:Empleado)-[t:TRABAJA_EN]->(p:Proyecto)
+	RETURN p.nombre AS Proyecto,
+       		sum(t.horasSemanales) AS TotalHorasSemanales;
+
+//Listar los empleados que trabajan en más de un proyecto
+	MATCH (e:Empleado)-[:TRABAJA_EN]->(p:Proyecto)
+	WITH e, count(DISTINCT p) AS cantidadProyectos
+	WHERE cantidadProyectos > 1
+	RETURN e.nombre + " " + e.apellido AS Empleado,
+       		cantidadProyectos;

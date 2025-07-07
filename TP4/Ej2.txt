@@ -1,0 +1,72 @@
+//Crear Carreras
+CREATE (:Carrera {nombre: 'Ingeniería'}),
+       (:Carrera {nombre: 'Psicología'}),
+       (:Carrera {nombre: 'Derecho'});
+
+//Crear estudiantes
+CREATE (e1:Estudiante {nombre: 'Martín', apellido: 'Fernández'}),
+       (e2:Estudiante {nombre: 'Sofía', apellido: 'López'}),
+       (e3:Estudiante {nombre: 'Diego', apellido: 'Alvarez'});
+
+//Crear categorías
+CREATE (:Categoría {nombre: 'Programación'}),
+       (:Categoría {nombre: 'Psicoanálisis'}),
+       (:Categoría {nombre: 'Filosofía'}),
+       (:Categoría {nombre: 'Derecho Penal'});
+
+//Crear libros
+CREATE (l1:Libro {titulo: 'Aprende Python'}),
+       (l2:Libro {titulo: 'Freud y el Psicoanálisis'}),
+       (l3:Libro {titulo: 'Ética para Amador'}),
+       (l4:Libro {titulo: 'Derecho Penal I'});
+
+//Crear prestamos
+MATCH (e1:Estudiante {nombre: 'Martín'}),
+      (e2:Estudiante {nombre: 'Sofía'}),
+      (e3:Estudiante {nombre: 'Diego'}),
+      (l1:Libro {titulo: 'Aprende Python'}),
+      (l2:Libro {titulo: 'Freud y el Psicoanálisis'}),
+      (l3:Libro {titulo: 'Ética para Amador'}),
+      (l4:Libro {titulo: 'Derecho Penal I'})
+CREATE 
+  (e1)-[:PIDIÓ {fecha: date("2025-06-01"), estado: "Activo"}]->(l1),
+  (e1)-[:PIDIÓ {fecha: date("2025-05-15"), estado: "Devuelto"}]->(l2),
+  (e2)-[:PIDIÓ {fecha: date("2025-05-20"), estado: "Activo"}]->(l3),
+  (e3)-[:PIDIÓ {fecha: date("2025-05-01"), estado: "Devuelto"}]->(l4),
+  (e2)-[:PIDIÓ {fecha: date("2025-06-15"), estado: "Activo"}]->(l2);
+
+//Relacionar estudiantes con carreras
+MATCH (e1:Estudiante {nombre: 'Martín'}), (c1:Carrera {nombre: 'Ingeniería'}),
+      (e2:Estudiante {nombre: 'Sofía'}), (c2:Carrera {nombre: 'Psicología'}),
+      (e3:Estudiante {nombre: 'Diego'}), (c3:Carrera {nombre: 'Derecho'})
+CREATE (e1)-[:PERTENECE_A]->(c1),
+       (e2)-[:PERTENECE_A]->(c2),
+       (e3)-[:PERTENECE_A]->(c3);
+
+//Relacionar libros con categorias
+MATCH (l1:Libro {titulo: 'Aprende Python'}), (c1:Categoría {nombre: 'Programación'}),
+      (l2:Libro {titulo: 'Freud y el Psicoanálisis'}), (c2:Categoría {nombre: 'Psicoanálisis'}),
+      (l3:Libro {titulo: 'Ética para Amador'}), (c3:Categoría {nombre: 'Filosofía'}),
+      (l4:Libro {titulo: 'Derecho Penal I'}), (c4:Categoría {nombre: 'Derecho Penal'})
+CREATE (l1)-[:PERTENECE_A]->(c1),
+       (l2)-[:PERTENECE_A]->(c2),
+       (l3)-[:PERTENECE_A]->(c3),
+       (l4)-[:PERTENECE_A]->(c4);
+
+//Obtener todos los libros actualmente prestados
+MATCH (e:Estudiante)-[r:PIDIÓ {estado: "Activo"}]->(l:Libro)
+RETURN l.titulo AS Libro, e.nombre + " " + e.apellido AS Estudiante, r.fecha AS FechaPrestamo;
+
+//Cantidad de libros pedidos por estudiante
+MATCH (e:Estudiante)-[r:PIDIÓ]->(l:Libro)
+RETURN e.nombre + " " + e.apellido AS Estudiante, count(r) AS CantidadPrestamos;
+
+//Categoria con mas prestamos activos
+MATCH (:Estudiante)-[r:PIDIÓ {estado: "Activo"}]->(l:Libro)-[:PERTENECE_A]->(c:Categoría)
+RETURN c.nombre AS Categoria, count(r) AS PrestamosActivos
+ORDER BY PrestamosActivos DESC;
+
+// Estudiantes sin prestamos
+MATCH (e:Estudiante)
+WHERE NOT (e)-[:PIDIÓ {estado: "Activo"}]->(:Libro)
+RETURN e.nombre + " " + e.apellido AS EstudianteSinPrestamosActivos;
